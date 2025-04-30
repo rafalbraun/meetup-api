@@ -51,7 +51,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserbyId(Long id) {
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
 
     public MeetupDto attendMeetup(Long meetupId) throws ResourceNotFoundException {
         Long userId = getCurrentUserId();
-        User user = getUserbyId(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
+        User user = getUserById(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
         Meetup meetup = meetupRepository.findById(meetupId).orElseThrow(() -> new ResourceNotFoundException(MEETUP_NOT_FOUND, meetupId));
         meetup.getAttendees().add(user);
         Meetup saved = meetupRepository.save(meetup);
@@ -100,7 +100,7 @@ public class UserService implements UserDetailsService {
 
     public MeetupDto unattendMeetup(Long meetupId) throws ResourceNotFoundException {
         Long userId = getCurrentUserId();
-        User user = getUserbyId(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
+        User user = getUserById(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
         Meetup meetup = meetupRepository.findById(meetupId).orElseThrow(() -> new ResourceNotFoundException(MEETUP_NOT_FOUND, meetupId));
         meetup.getAttendees().remove(user);
         Meetup saved = meetupRepository.save(meetup);
@@ -109,7 +109,7 @@ public class UserService implements UserDetailsService {
 
     public GroupDto joinGroup(Long groupId) throws ResourceNotFoundException {
         Long userId = getCurrentUserId();
-        User user = getUserbyId(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
+        User user = getUserById(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new ResourceNotFoundException(GROUP_NOT_FOUND, groupId));
         group.getMembers().add(user);
         Group saved = groupRepository.save(group);
@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
 
     public GroupDto leaveGroup(Long groupId) throws ResourceNotFoundException {
         Long userId = getCurrentUserId();
-        User user = getUserbyId(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
+        User user = getUserById(getCurrentUserId()).orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND, userId));
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new ResourceNotFoundException(GROUP_NOT_FOUND, groupId));
         group.getMembers().remove(user);
         Group saved = groupRepository.save(group);
