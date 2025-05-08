@@ -6,6 +6,7 @@
       <writeAnnotation name="jakarta.persistence.OneToMany" />
       <writeAnnotation name="jakarta.persistence.ManyToMany" />
       <writeAnnotation name="jakarta.persistence.EmbeddedId" />
+      <writeAnnotation name="org.springframework.beans.factory.annotation.Autowired" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
