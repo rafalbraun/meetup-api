@@ -6,15 +6,14 @@ public class Constants {
     public static final String ME_URL = "/api/me";
     public static final String TEST = "/api/test";
     public static final String TEST_STRING = "test1234";
-    public final static String[] ALLOWED_URLS = {LOGIN_URL, ME_URL};
 
     public static final String MEETUPS_IN_THE_GROUP = "/api/meetups/{groupId}/groups/";
     public static final String ALL_MEETUPS_IN_LOCATION = "/api/locations/{locationId}/meetups";
     public static final String ALL_MEETUP_ATTENDEES = "/api/meetup/{id}/attendees";
-    public static final String ATTEND_MEETUP = "/attend/{id}";
-    public static final String UNATTEND_MEETUP = "/unattend/{id}";
-    public static final String JOIN_GROUP = "/join/{id}";
-    public static final String LEAVE_GROUP = "/leave/{id}";
+    public static final String ATTEND_MEETUP = "/api/attend/{id}";
+    public static final String UNATTEND_MEETUP = "/api/unattend/{id}";
+    public static final String JOIN_GROUP = "/api/join/{id}";
+    public static final String LEAVE_GROUP = "/api/leave/{id}";
     public static final String JOINED_MEETUPS = "/api/meetups/joined";
     public static final String JOINED_GROUPS = "/api/groups/joined";
     public static final String ORGANIZED_MEETUPS = "/api/meetups/organized";
@@ -42,4 +41,15 @@ public class Constants {
     public static final String GET_USER_BY_USERNAME = "/api/userbyusername/{username}";
     public static final String UPDATE_USER = "/api/user/{id}";
 
+    public final static String[] ALLOWED_URLS = {
+            LOGIN_URL,
+            REGISTER,
+            ME_URL,
+            GET_LOCATIONS,
+            TEST,
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml"
+    };
 }

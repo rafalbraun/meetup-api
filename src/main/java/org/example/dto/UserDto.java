@@ -34,8 +34,8 @@ public class UserDto {
     )
     private String password;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Email must be valid")
+    //@NotBlank(message = "Email cannot be blank")
+    //@Email(message = "Email must be valid")
     @Pattern(
             regexp = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$",
             message = "Email format is invalid"

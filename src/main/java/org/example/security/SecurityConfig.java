@@ -29,11 +29,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ALLOWED_URLS).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(ALLOWED_URLS)
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
+                .csrf(csrf -> csrf.disable())
                 .addFilterBefore(new JwtAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -48,14 +50,5 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(UserRepository userRepository, MeetupRepository meetupRepository, GroupRepository groupRepository) {
         return new UserService(userRepository, meetupRepository, groupRepository, passwordEncoder());
     }
-
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService() {
-//        UserDetails user = User.withUsername("user")
-//                .password("{noop}password")
-//                .roles("USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
 
 }
