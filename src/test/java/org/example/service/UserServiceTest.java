@@ -13,11 +13,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.example.controllers.Utils.*;
 
-import org.example.model.Group;
-import org.example.model.Meetup;
 import org.example.repository.GroupRepository;
 import org.example.repository.MeetupRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +65,7 @@ public class UserServiceTest {
 
         List<UserDto> attendees = List.of(userDto);
         MeetupDto meetupDto = new MeetupDto();
-        meetupDto.setTitle(MEETUP_TITLE_1);
+        meetupDto.setTitle(MEETUP_TITLE);
         meetupDto.setDateTime(Instant.now());
         meetupDto.setLocation(locationDto);
         meetupDto.setOrganizer(userDto);

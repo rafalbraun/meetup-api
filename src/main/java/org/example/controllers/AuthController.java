@@ -24,12 +24,10 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    public AuthController(JwtService jwtService, UserService userService, UserRepository userRepository) {
+    public AuthController(JwtService jwtService, UserService userService) {
         this.jwtService = jwtService;
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping(Constants.LOGIN_URL)

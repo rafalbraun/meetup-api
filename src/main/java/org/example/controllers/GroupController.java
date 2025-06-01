@@ -57,7 +57,7 @@ public class GroupController {
     @DeleteMapping(DELETE_GROUP)
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) throws ResourceNotFoundException {
         groupService.deleteGroup(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(GROUP_MEMBERS)

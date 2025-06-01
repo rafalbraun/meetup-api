@@ -16,7 +16,6 @@ import org.example.model.Location;
 import org.example.model.User;
 import org.example.repository.GroupRepository;
 import org.example.repository.LocationRepository;
-import org.example.repository.MeetupRepository;
 import org.example.repository.UserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.MvcResult;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -57,37 +55,32 @@ public class MeetupControllerTest {
     public LocationRepository locationRepository;
 
     @Autowired
-    public MeetupRepository meetupRepository;
-
-    @Autowired
     public GroupRepository groupRepository;
 
     LocationDto locationDto;
     UserDto ownerDto;
     GroupDto groupDto;
 
-    @BeforeEach
-    void setup() {
+    @Test
+    void shouldCreateMeetupEndpoint() throws Exception {
+
+        // preconditions
         User user = new User(USERNAME, PASSWORD);
         Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
         User owner = new User(OWNER, PASSWORD);
         Group savedGroup = new Group(GROUP_NAME, owner);
-
         locationRepository.save(location);
         userRepository.save(owner);
         userRepository.save(user);
         groupRepository.save(savedGroup);
-
         locationDto = LocationMapper.toDto(location);
         ownerDto = UserMapper.toDto(owner);
         groupDto = GroupMapper.toDto(savedGroup);
-    }
 
-    @Test
-    void shouldCreateMeetupEndpoint() throws Exception {
+        // test
         String token = getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        MeetupDto request = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +88,7 @@ public class MeetupControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value(MEETUP_TITLE_1))
+                .andExpect(jsonPath("$.title").value(MEETUP_TITLE))
                 .andExpect(jsonPath("$.description").value(MEETUP_DESCR))
                 .andExpect(jsonPath("$.location.id").value(locationDto.getId()))
                 .andExpect(jsonPath("$.organizer.id").value(ownerDto.getId()))
@@ -121,6 +114,21 @@ public class MeetupControllerTest {
 
     @Test
     void shouldGetMeetupsEndpoint() throws Exception {
+
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        User owner = new User(OWNER, PASSWORD);
+        Group savedGroup = new Group(GROUP_NAME, owner);
+        locationRepository.save(location);
+        userRepository.save(owner);
+        userRepository.save(user);
+        groupRepository.save(savedGroup);
+        locationDto = LocationMapper.toDto(location);
+        ownerDto = UserMapper.toDto(owner);
+        groupDto = GroupMapper.toDto(savedGroup);
+
+        // test
         String token = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
 
         for (String title : MEETUP_TITLES) {
@@ -141,9 +149,24 @@ public class MeetupControllerTest {
 
     @Test
     void shouldUpdateMeetupEndpoint() throws Exception {
+
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        User owner = new User(OWNER, PASSWORD);
+        Group savedGroup = new Group(GROUP_NAME, owner);
+        locationRepository.save(location);
+        userRepository.save(owner);
+        userRepository.save(user);
+        groupRepository.save(savedGroup);
+        locationDto = LocationMapper.toDto(location);
+        ownerDto = UserMapper.toDto(owner);
+        groupDto = GroupMapper.toDto(savedGroup);
+
+        // test
         String token = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        MeetupDto request = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,26 +182,41 @@ public class MeetupControllerTest {
 
         MeetupDto meetup = objectMapper.readValue(content, MeetupDto.class);
 
-        request.setTitle(MEETUP_TITLE_2);
+        request.setTitle(MEETUP_TITLE_CHANGED);
         mockMvc.perform(put(UPDATE_MEETUP, meetup.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(MEETUP_TITLE_2));
+                .andExpect(jsonPath("$.title").value(MEETUP_TITLE_CHANGED));
 
         mockMvc.perform(get(GET_MEETUP, meetup.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(MEETUP_TITLE_2));
+                .andExpect(jsonPath("$.title").value(MEETUP_TITLE_CHANGED));
     }
 
     @Test
     void shouldRemoveMeetupEndpoint() throws Exception {
+
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        User owner = new User(OWNER, PASSWORD);
+        Group savedGroup = new Group(GROUP_NAME, owner);
+        locationRepository.save(location);
+        userRepository.save(owner);
+        userRepository.save(user);
+        groupRepository.save(savedGroup);
+        locationDto = LocationMapper.toDto(location);
+        ownerDto = UserMapper.toDto(owner);
+        groupDto = GroupMapper.toDto(savedGroup);
+
+        // test
         String token = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        MeetupDto request = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -209,9 +247,24 @@ public class MeetupControllerTest {
 
     @Test
     void shouldAttendMeetupEndpoint() throws Exception {
+
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        User owner = new User(OWNER, PASSWORD);
+        Group savedGroup = new Group(GROUP_NAME, owner);
+        locationRepository.save(location);
+        userRepository.save(owner);
+        userRepository.save(user);
+        groupRepository.save(savedGroup);
+        locationDto = LocationMapper.toDto(location);
+        ownerDto = UserMapper.toDto(owner);
+        groupDto = GroupMapper.toDto(savedGroup);
+
+        // test
         String token_owner = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        MeetupDto request = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -251,5 +304,46 @@ public class MeetupControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+/*
+    @Test
+    void shouldGetMeetupsByLocationEndpoint() throws Exception {
 
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        User owner = new User(OWNER, PASSWORD);
+        Group savedGroup = new Group(GROUP_NAME, owner);
+        userRepository.save(owner);
+        userRepository.save(user);
+        groupRepository.save(savedGroup);
+        ownerDto = UserMapper.toDto(owner);
+        groupDto = GroupMapper.toDto(savedGroup);
+
+        // test
+        for (Location location : TEST_LOCATIONS) {
+            locationRepository.save(location);
+        }
+
+        String token_owner = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("Authorization", "Bearer " + token_owner))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        MeetupDto meetup = objectMapper.readValue(content, MeetupDto.class);
+
+
+
+
+
+    }
+*/
 }

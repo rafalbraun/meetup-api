@@ -30,31 +30,30 @@ This API facilitates the organization and management of meetups within user-crea
 
 ### Technicals
 
-
-| Endpoint                           | Controller         | Endpoint Name        | Test Name                                                           |
-|------------------------------------|--------------------|----------------------|---------------------------------------------------------------------|
-| create group                       | GroupController    | createGroup          | shouldCreateGroupEndpoint                                           |
-| update group                       | GroupController    | updateGroup          | shouldUpdateGroupEndpoint                                           |
-| delete group                       | GroupController    | deleteGroup          | shouldRemoveGroupEndpoint                                           |
-| get all groups                     | GroupController    | getGroups            |                                                                     |
-| get all meetups in given location  | GroupController    | getMeetupsByLocation |                                                                     |
-| get all meetups within given group | GroupController    | getGroupMeetups      |                                                                     |
-| get all group members              | GroupController    | getGroupMembers      |                                                                     |
-| create meetup                      | MeetupController   | createMeetup         | shouldOrganizeMeetingInTheGroupEndpoint, shouldCreateMeetupEndpoint |
-| update meetup                      | MeetupController   | updateMeetup         | shouldUpdateMeetupEndpoint                                          |
-| delete meetup                      | MeetupController   | deleteMeetup         |                                                                     |
-| get all meetups                    | MeetupController   | getMeetups           | shouldRemoveMeetupEndpoint                                          |
-| get meetup                         | MeetupController   | getMeetup            | shouldGetMeetupsEndpoint                                            |
-| get all meetup attendees           | MeetupController   | getMeetupAttendees   |                                                                     |
-| attend meetup                      | UserController     | attendMeetup         | shouldAttendMeetupEndpoint                                          |
-| unattend meetup                    | UserController     | unattendMeetup       | shouldAttendMeetupEndpoint                                          |
-| join group                         | UserController     | joinGroup            | shouldJoinGroupEndpoint                                             |
-| leave group                        | UserController     | leaveGroup           | shouldJoinGroupEndpoint                                             |
-| get all user's owned groups        | UserController     | userJoinedGroups     |                                                                     |
-| get all user's joined groups       | UserController     | userOwnedGroups      |                                                                     |
-| get all user's organized meetups   | UserController     | userOrganizedMeetups |                                                                     |
-| get all user's attended meetups    | UserController     | userJoinedMeetups    |                                                                     |
-| create location                    | LocationController | createLocation       | shouldCreateLocationEndpoint                                        |
+| Endpoint                           | Controller         | Endpoint Name        | Test Name                               |
+|------------------------------------|--------------------|----------------------|-----------------------------------------|
+| create group                       | GroupController    | createGroup          | shouldCreateGroupEndpoint               |
+| update group                       | GroupController    | updateGroup          | shouldUpdateGroupEndpoint               |
+| delete group                       | GroupController    | deleteGroup          | shouldRemoveGroupEndpoint               |
+| get all groups                     | GroupController    | getGroups            | shouldGetAllGroupsEndpoint              |
+| get all meetups in given location  | GroupController    | getMeetupsByLocation |                                         |
+| get all meetups within given group | GroupController    | getGroupMeetups      |                                         |
+| get all group members              | GroupController    | getGroupMembers      |                                         |
+| create meetup                      | MeetupController   | createMeetup         | shouldOrganizeMeetingInTheGroupEndpoint |
+| update meetup                      | MeetupController   | updateMeetup         | shouldUpdateMeetupEndpoint              |
+| delete meetup                      | MeetupController   | deleteMeetup         |                                         |
+| get all meetups                    | MeetupController   | getMeetups           | shouldRemoveMeetupEndpoint              |
+| get meetup                         | MeetupController   | getMeetup            | shouldGetMeetupsEndpoint                |
+| get all meetup attendees           | MeetupController   | getMeetupAttendees   |                                         |
+| attend meetup                      | UserController     | attendMeetup         | shouldAttendMeetupEndpoint              |
+| unattend meetup                    | UserController     | unattendMeetup       | shouldAttendMeetupEndpoint              |
+| join group                         | UserController     | joinGroup            | shouldJoinGroupEndpoint                 |
+| leave group                        | UserController     | leaveGroup           | shouldJoinGroupEndpoint                 |
+| get all user's owned groups        | UserController     | userJoinedGroups     |                                         |
+| get all user's joined groups       | UserController     | userOwnedGroups      |                                         |
+| get all user's organized meetups   | UserController     | userOrganizedMeetups |                                         |
+| get all user's attended meetups    | UserController     | userJoinedMeetups    |                                         |
+| create location                    | LocationController | createLocation       | shouldCreateLocationEndpoint            |
 
 ### Key Features:
 - **Meetup Management**

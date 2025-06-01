@@ -12,18 +12,13 @@ import org.example.mapper.LocationMapper;
 import org.example.mapper.UserMapper;
 import org.example.model.Group;
 import org.example.model.Location;
-import org.example.model.Meetup;
 import org.example.model.User;
 import org.example.repository.GroupRepository;
 import org.example.repository.LocationRepository;
-import org.example.repository.MeetupRepository;
 import org.example.repository.UserRepository;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.time.Instant;
 
 import static org.example.Constants.*;
 import static org.example.controllers.Utils.*;
@@ -32,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -57,37 +51,28 @@ public class UserControllerTest {
     private LocationRepository locationRepository;
 
     @Autowired
-    private MeetupRepository meetupRepository;
-
-    @Autowired
     private GroupRepository groupRepository;
 
-    LocationDto locationDto;
-    UserDto ownerDto;
-    GroupDto groupDto;
+    @Test
+    void shouldUserAttendMeetupEndpoint() throws Exception {
 
-    @BeforeEach
-    void setup() {
+        // preconditions
         User user = new User(USERNAME, PASSWORD);
         Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
         User owner = new User(OWNER, PASSWORD);
         Group savedGroup = new Group(GROUP_NAME, owner);
-
         locationRepository.save(location);
         userRepository.save(owner);
         userRepository.save(user);
         groupRepository.save(savedGroup);
+        LocationDto locationDto = LocationMapper.toDto(location);
+        UserDto ownerDto = UserMapper.toDto(owner);
+        GroupDto groupDto = GroupMapper.toDto(savedGroup);
 
-        locationDto = LocationMapper.toDto(location);
-        ownerDto = UserMapper.toDto(owner);
-        groupDto = GroupMapper.toDto(savedGroup);
-    }
-
-    @Test
-    void shouldUserAttendMeetupEndpoint() throws Exception {
+        // test
         String token = getAuthToken(mockMvc, USERNAME, PASSWORD);
 
-        MeetupDto request = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, groupDto);
+        MeetupDto request = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, groupDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,9 +119,20 @@ public class UserControllerTest {
 
     @Test
     void shouldUserJoinGroupEndpoint() throws Exception {
+
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        User owner = new User(OWNER, PASSWORD);
+        locationRepository.save(location);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
         String token = getAuthToken(mockMvc, USERNAME, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -144,7 +140,7 @@ public class UserControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(GROUP_TITLE_1))
+                .andExpect(jsonPath("$.name").value(GROUP_NAME))
                 .andExpect(jsonPath("$.owner.id").value(ownerDto.getId()))
                 .andReturn();
 
@@ -184,6 +180,5 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.length()").value(0))
                 .andReturn();
     }
-
 
 }

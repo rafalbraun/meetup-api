@@ -47,14 +47,13 @@ public class LocationControllerTest {
     @Autowired
     public GroupRepository groupRepository;
 
-    @BeforeEach
-    void setup() {
-        User user = new User(USERNAME, PASSWORD);
-        userRepository.save(user);
-    }
-
     @Test
     void shouldCreateLocationEndpoint() throws Exception {
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(user);
+
+        // test
         String token = getAuthToken(mockMvc, USERNAME, PASSWORD);
 
         LocationDto request = new LocationDto();

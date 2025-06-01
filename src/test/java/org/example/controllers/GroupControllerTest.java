@@ -7,22 +7,16 @@ import org.example.dto.GroupDto;
 import org.example.dto.LocationDto;
 import org.example.dto.MeetupDto;
 import org.example.dto.UserDto;
-import org.example.exceptions.ResourceNotFoundException;
-import org.example.mapper.GroupMapper;
 import org.example.mapper.LocationMapper;
 import org.example.mapper.UserMapper;
-import org.example.model.Group;
 import org.example.model.Location;
 import org.example.model.User;
 import org.example.repository.LocationRepository;
-import org.example.repository.MeetupRepository;
 import org.example.repository.UserRepository;
 import org.example.repository.GroupRepository;
-import org.example.service.GroupService;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.example.Constants.*;
 import static org.example.controllers.Utils.*;
@@ -30,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,43 +45,25 @@ public class GroupControllerTest {
     public UserRepository userRepository;
 
     @Autowired
-    public LocationRepository locationRepository;
-
-    @Autowired
-    public MeetupRepository meetupRepository;
-
-    @Autowired
     public GroupRepository groupRepository;
 
     @Autowired
-    public GroupService groupService;
-
-    LocationDto locationDto;
-    UserDto ownerDto;
-    GroupDto groupDto;
-
-    @BeforeEach
-    void setup() {
-        User owner = new User(OWNER, PASSWORD);
-        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
-        Group savedGroup = new Group(GROUP_NAME, owner);
-        User user = new User(USERNAME, PASSWORD);
-
-        userRepository.save(user);
-        userRepository.save(owner);
-        groupRepository.save(savedGroup);
-        locationRepository.save(location);
-
-        ownerDto = UserMapper.toDto(owner);
-        locationDto = LocationMapper.toDto(location);
-        groupDto = GroupMapper.toDto(savedGroup);
-    }
+    public LocationRepository locationRepository;
 
     @Test
     void shouldCreateGroupEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
         String token = getAuthToken(mockMvc, USERNAME, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,7 +71,7 @@ public class GroupControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(GROUP_TITLE_1))
+                .andExpect(jsonPath("$.name").value(GROUP_NAME))
                 .andExpect(jsonPath("$.owner.id").value(ownerDto.getId()))
                 .andReturn();
 
@@ -117,10 +92,53 @@ public class GroupControllerTest {
     }
 
     @Test
-    void shouldUpdateGroupEndpoint() throws Exception {
+    void shouldGetAllGroupsEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
         String token = getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        for (String groupName : GROUP_NAMES) {
+            GroupDto request = createGroupRequest(groupName, ownerDto);
+            request.setName(groupName);
+            mockMvc.perform(post(CREATE_GROUP)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.id").exists())
+                    .andExpect(jsonPath("$.name").value(groupName))
+                    .andExpect(jsonPath("$.owner.id").value(ownerDto.getId()))
+                    .andReturn();
+        }
+
+        mockMvc.perform(get(GET_GROUPS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(GROUP_NAMES.length));
+    }
+
+    @Test
+    void shouldUpdateGroupEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
+        String token = getAuthToken(mockMvc, OWNER, PASSWORD);
+
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +146,7 @@ public class GroupControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(GROUP_TITLE_1))
+                .andExpect(jsonPath("$.name").value(GROUP_NAME))
                 .andExpect(jsonPath("$.owner.id").value(ownerDto.getId()))
                 .andReturn();
 
@@ -140,8 +158,8 @@ public class GroupControllerTest {
 
         GroupDto group = objectMapper.readValue(content, GroupDto.class);
 
-        request.setName(GROUP_TITLE_2);
-        mockMvc.perform(MockMvcRequestBuilders.put(UPDATE_GROUP, group.getId())
+        request.setName(GROUP_NAME_CHANGED);
+        mockMvc.perform(put(UPDATE_GROUP, group.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + token))
@@ -152,15 +170,24 @@ public class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(GROUP_TITLE_2))
+                .andExpect(jsonPath("$.name").value(GROUP_NAME_CHANGED))
                 .andExpect(jsonPath("$.id").value(group.getId()));
     }
 
     @Test
     void shouldRemoveGroupEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
         String token = getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -191,10 +218,19 @@ public class GroupControllerTest {
 
     @Test
     void shouldJoinGroupEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(owner);
+        userRepository.save(user);
+        UserDto ownerDto = UserMapper.toDto(owner);
+
+        // test
         String token_owner = Utils.getAuthToken(mockMvc, OWNER, PASSWORD);
         String token_user = Utils.getAuthToken(mockMvc, USERNAME, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -235,10 +271,22 @@ public class GroupControllerTest {
     }
 
     @Test
-    void shouldOrganizeMeetingInTheGroupEndpoint() throws Exception, ResourceNotFoundException {
+    void shouldOrganizeMeetingInTheGroupEndpoint() throws Exception {
+
+        //preconditions
+        User owner = new User(OWNER, PASSWORD);
+        User user = new User(USERNAME, PASSWORD);
+        Location location = new Location(LOCATION_CITY, LOCATION_ADDRESS);
+        userRepository.save(owner);
+        userRepository.save(user);
+        locationRepository.save(location);
+        UserDto ownerDto = UserMapper.toDto(owner);
+        LocationDto locationDto = LocationMapper.toDto(location);
+
+        // test
         String token_owner = getAuthToken(mockMvc, OWNER, PASSWORD);
 
-        GroupDto request = createGroupRequest(GROUP_TITLE_1, ownerDto);
+        GroupDto request = createGroupRequest(GROUP_NAME, ownerDto);
 
         MvcResult result = mockMvc.perform(post(CREATE_GROUP)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -255,7 +303,7 @@ public class GroupControllerTest {
 
         GroupDto group = objectMapper.readValue(content, GroupDto.class);
 
-        MeetupDto meetupRequest = createMeetupRequest(MEETUP_TITLE_1, MEETUP_DESCR, ownerDto, locationDto, group);
+        MeetupDto meetupRequest = createMeetupRequest(MEETUP_TITLE, MEETUP_DESCR, ownerDto, locationDto, group);
         mockMvc.perform(post(CREATE_MEETUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(meetupRequest))

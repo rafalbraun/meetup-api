@@ -42,29 +42,14 @@ public class AuthIntegrationTest {
     @Autowired
     public UserRepository userRepository;
 
-    @Autowired
-    public LocationRepository locationRepository;
-
-    @Autowired
-    public MeetupRepository meetupRepository;
-
-    @Autowired
-    public GroupRepository groupRepository;
-
-    @BeforeEach
-    void setup() {
-        meetupRepository.deleteAllInBatch();
-        groupRepository.deleteAllInBatch();
-        locationRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-
-        User user = new User(USERNAME, PASSWORD);
-        userRepository.save(user);
-    }
-
     @Test
     void shouldAuthenticateAndAccessSecuredEndpoint() throws Exception {
 
+        // preconditions
+        User user = new User(USERNAME, PASSWORD);
+        userRepository.save(user);
+
+        // test
         MvcResult loginResult = mockMvc.perform(post(LOGIN_URL)
                         .param("username", USERNAME)
                         .param("password", PASSWORD))
